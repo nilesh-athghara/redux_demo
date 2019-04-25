@@ -10,8 +10,8 @@ class AddItemAction{
 
   //when building these actions we need to think about what type of data we need to expose to our ui to allow these changes to happen
   static int _id = 0;
-  final String items;
-  AddItemAction(this.items)
+  final String item;
+  AddItemAction(this.item)
   {
     _id++;
   }

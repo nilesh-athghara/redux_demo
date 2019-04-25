@@ -7,7 +7,9 @@ import 'package:practice/redux/actions.dart';
 //we take a state and an action as parameter and return a new state
 AppState appStateReducer(AppState state,action)
 {
-  return AppState();
+  return AppState(
+    items: itemReducer(state.items, action),
+  );
 }
 
 //we can create specific reducer to allow us to manipulate only specific data like our list of items
@@ -16,6 +18,28 @@ AppState appStateReducer(AppState state,action)
 
 List<Item> itemReducer(List<Item> state,action)
 {
+  //here return a new list by first adding all the previous daa and then the new action
+  //.. is called cascade operator
+  if(action is AddItemAction)
+    {
+      return []
+        ..addAll(state)
+        ..add(Item (id: action.id, body: action.item));
+      //this will return a list with all the original state along with the new item
+    }
 
-
+  if(action is RemoveItemAction)
+    {
+      //here first we will create our original list
+      return List.unmodifiable(List.from(state)..remove(action.item));
+    }
+  if(action is RemoveItemsAction)
+    {
+      //for this action we just need to return an empty list
+      //here we can do two things
+      //return [];
+      return List.unmodifiable(<Item>[]);
+    }
+  //if no action gets through the reducer the original state is returned
+  return state;
 }

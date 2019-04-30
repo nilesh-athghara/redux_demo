@@ -4,6 +4,7 @@ import 'package:redux/redux.dart';
 import 'package:practice/model/model.dart';
 import 'package:practice/redux/reducer.dart';
 import 'package:practice/redux/actions.dart';
+import 'package:practice/redux/middleware.dart';
 
 //three major points for flutter
 //1. Single source of truth--whole state of application is stored in a store
@@ -24,13 +25,22 @@ class _MyApp extends State<MyApp> {
   Widget build(BuildContext context) {
     //here we will create a store that will store our application state and we will wrap material app with it
     final Store<AppState> store =
-        Store<AppState>(appStateReducer, initialState: AppState.initialState());
+        Store<AppState>(appStateReducer, initialState: AppState.initialState(),
+            //here we have a middleware tag which accepts a list of middleware
+            middleware: [appStateMiddleware]);
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Redux Demo",
-        home: MyHomePage(),
+        //to load initial state we will use store builder
+        //it is like a store connector but instead of using a viewModel and using
+        //specific functions it will accept the whole state
+        home: StoreBuilder<AppState>(
+          builder: (BuildContext context, Store<AppState> store) =>
+              MyHomePage(store),
+          onInit: (store) => store.dispatch(GetItemsAction()),
+        ),
         theme: ThemeData.dark(),
       ),
     );
@@ -41,13 +51,15 @@ class _MyApp extends State<MyApp> {
 //we will have to add store connectors to proliferate the store down the structure
 
 class MyHomePage extends StatefulWidget {
+  final Store<AppState> store;
+
+  MyHomePage(this.store);
+
   @override
   _MyHomePage createState() => _MyHomePage();
 }
 
 class _MyHomePage extends State<MyHomePage> {
-
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -55,14 +67,13 @@ class _MyHomePage extends State<MyHomePage> {
           title: new Text("Redux Examples"),
         ),
         body: StoreConnector<AppState, _ViewModel>(
-            //this _ViewModel is just a middle piece that connects our ui and store
+          //this _ViewModel is just a middle piece that connects our ui and store
           //converter is a function that will take up the store and convert it into the _ViewModel
           //that we want to pass down the tree
-          converter: (Store<AppState> store){
+          converter: (Store<AppState> store) {
             return _ViewModel.create(store);
           },
-          builder: (BuildContext context,_ViewModel viewModel)
-          {
+          builder: (BuildContext context, _ViewModel viewModel) {
             return Container(
               child: Column(
                 children: <Widget>[
@@ -75,7 +86,7 @@ class _MyHomePage extends State<MyHomePage> {
               ),
             );
           },
-            ));
+        ));
   }
 }
 
@@ -104,64 +115,63 @@ class _ViewModel {
     _onRemoveItems() {
       store.dispatch(RemoveItemsAction());
     }
+
     //every time this method is called we will return a new _ViewModel instance from our factory
     return _ViewModel(
-      items: store.state.items,
-      onAddItem: _onAddItem,
-      onRemoveItem: _onRemoveItem,
-      onRemoveItems: _onRemoveItems
-    );
+        items: store.state.items,
+        onAddItem: _onAddItem,
+        onRemoveItem: _onRemoveItem,
+        onRemoveItems: _onRemoveItems);
   }
 }
 
-class AddItemWidget extends StatefulWidget{
-
+class AddItemWidget extends StatefulWidget {
   final _ViewModel model;
+
   AddItemWidget(this.model);
 
   @override
-  _AddItemWidget createState()=> _AddItemWidget();
+  _AddItemWidget createState() => _AddItemWidget();
 }
 
-class _AddItemWidget extends State<AddItemWidget>
-{
-  final TextEditingController controller=TextEditingController();
+class _AddItemWidget extends State<AddItemWidget> {
+  final TextEditingController controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: TextField(
         controller: controller,
-        decoration: InputDecoration(
-          hintText: "Add an Item"
-        ),
-        onSubmitted: (String content){
+        decoration: InputDecoration(hintText: "Add an Item"),
+        onSubmitted: (String content) {
           widget.model.onAddItem(content);
-          controller.text=" ";
+          controller.text = " ";
         },
       ),
     );
   }
 }
 
-class ItemListWidget extends StatelessWidget
-{
+class ItemListWidget extends StatelessWidget {
   final _ViewModel model;
-  ItemListWidget(this.model);
 
+  ItemListWidget(this.model);
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: model.items.map((Item item){
-         return ListTile(
+      children: model.items.map((Item item) {
+        return ListTile(
           title: Text(item.body),
           trailing: IconButton(
-            onPressed: (){model.onRemoveItem(item);},
-            icon: Icon(
-              Icons.delete,color: Colors.white,
-            )
-          ),
+              onPressed: () {
+                model.onRemoveItem(item);
+              },
+              icon: Icon(
+                Icons.delete,
+                color: Colors.white,
+              )),
         );
       }).toList(),
     );
@@ -176,9 +186,13 @@ class RemoveItemsButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      child: Text("Delete all items",style: TextStyle(color: Colors.white),),
-      onPressed: (){model.onRemoveItems();},
+      child: Text(
+        "Delete all items",
+        style: TextStyle(color: Colors.white),
+      ),
+      onPressed: () {
+        model.onRemoveItems();
+      },
     );
   }
-
 }

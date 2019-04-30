@@ -13,6 +13,12 @@ class Item {
         id: id ?? this.id,
         body: body ?? this.body);
   }
+
+  Item.fromJson(Map json)
+      : body = json['body'],
+        id = json['id'];
+
+  Map toJson() => {"id": id, 'body': body};
 }
 
 class AppState {
@@ -24,4 +30,14 @@ class AppState {
   //named Constructor to make initial state
   //its just an empty list
   AppState.initialState() : items = List.unmodifiable(<Item>[]);
+
+  //create a from Json function to retrieve from shared prefs
+  //here we take out data from key "items" then we convert that into a list through as List
+  //after that wwe convert each item into object of Items class through map
+  //and then put them back again by toList()
+  AppState.fromJson(Map json)
+      : items = (json['items'] as List).map((i) => Item.fromJson(i)).toList();
+
+//create a toJson function to save the appState
+  Map toJson() => {'items': items};
 }

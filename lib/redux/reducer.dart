@@ -40,6 +40,11 @@ List<Item> itemReducer(List<Item> state,action)
       //return [];
       return List.unmodifiable(<Item>[]);
     }
+  if(action is LoadedItemsAction)
+    {
+      //this is the same items list that we mentioned in our actions class
+      return action.items;
+    }
   //if no action gets through the reducer the original state is returned
   return state;
 }

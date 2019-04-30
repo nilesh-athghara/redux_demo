@@ -34,3 +34,20 @@ class RemoveItemsAction
   //so we leave this empty for now
 
 }
+
+//to work with middle wares we need to function
+//1.one action that will we dispatched from user interface to middleware
+//2. another action that gets dispatched from our middle to our reducer
+
+//this will be called from ui
+class GetItemsAction
+{
+  //since it wont require any specific data to load items we leave it empty
+}
+
+//this will be called from middleware
+class LoadedItemsAction
+{
+  final List <Item> items;
+  LoadedItemsAction(this.items);
+}

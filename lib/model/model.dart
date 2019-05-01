@@ -3,22 +3,32 @@ import 'package:flutter/foundation.dart';
 class Item {
   final int id;
   final String body;
+  final bool completed;
 
-  Item({@required this.id, @required this.body});
+  Item({@required this.id, @required this.body, this.completed = false});
 
   //this function takes parameters and ensures that a new object is created instead of mutating it.
   Item copyWith({int id, String body}) {
     return Item(
         //if received id and body is null we take previous
         id: id ?? this.id,
-        body: body ?? this.body);
+        body: body ?? this.body,
+        completed: completed ?? this.completed);
   }
 
   Item.fromJson(Map json)
       : body = json['body'],
-        id = json['id'];
+        id = json['id'],
+        completed = json['completed'];
 
-  Map toJson() => {"id": id, 'body': body};
+  Map toJson() => {"id": id, 'body': body, 'completed': completed};
+
+  //to get actual data instead on instance of class
+//we can override to string functions
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 class AppState {
@@ -40,4 +50,9 @@ class AppState {
 
 //create a toJson function to save the appState
   Map toJson() => {'items': items};
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }

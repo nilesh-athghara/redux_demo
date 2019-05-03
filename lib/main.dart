@@ -27,7 +27,7 @@ class _MyApp extends State<MyApp> {
     final Store<AppState> store =
         Store<AppState>(appStateReducer, initialState: AppState.initialState(),
             //here we have a middleware tag which accepts a list of middleware
-            middleware: [appStateMiddleware]);
+            middleware: appStateMiddleware());
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(

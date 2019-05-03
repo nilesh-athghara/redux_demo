@@ -35,7 +35,7 @@ class AppState {
   //entire state of application will be represented by this class
   final List<Item> items;
 
-  AppState({@required this.items});
+  const AppState({@required this.items});
 
   //named Constructor to make initial state
   //its just an empty list

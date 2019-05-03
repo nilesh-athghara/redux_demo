@@ -6,8 +6,6 @@ import 'package:practice/model/model.dart';
 
 
 class AddItemAction{
-
-
   //when building these actions we need to think about what type of data we need to expose to our ui to allow these changes to happen
   static int _id = 0;
   final String item;
@@ -35,7 +33,7 @@ class RemoveItemsAction
 
 }
 
-//to work with middle wares we need to function
+//to work with middle wares we need two functions
 //1.one action that will we dispatched from user interface to middleware
 //2. another action that gets dispatched from our middle to our reducer
 

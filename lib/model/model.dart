@@ -8,7 +8,7 @@ class Item {
   Item({@required this.id, @required this.body, this.completed = false});
 
   //this function takes parameters and ensures that a new object is created instead of mutating it.
-  Item copyWith({int id, String body}) {
+  Item copyWith({int id, String body,bool completed}) {
     return Item(
         //if received id and body is null we take previous
         id: id ?? this.id,

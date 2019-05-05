@@ -24,10 +24,10 @@ class _MyApp extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     //here we will create a store that will store our application state and we will wrap material app with it
-    final Store<AppState> store =
-        Store<AppState>(appStateReducer, initialState: AppState.initialState(),
-            //here we have a middleware tag which accepts a list of middleware
-            middleware: appStateMiddleware());
+    final Store<AppState> store = Store<AppState>(appStateReducer,
+        initialState: AppState.initialState(),
+        //here we have a middleware tag which accepts a list of middleware
+        middleware: appStateMiddleware());
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
@@ -96,10 +96,15 @@ class _ViewModel {
   final Function(String) onAddItem;
   final Function(Item) onRemoveItem;
   final Function() onRemoveItems;
+  final Function(Item) onCompleted;
 
   //now we will set up constructors
   _ViewModel(
-      {this.items, this.onAddItem, this.onRemoveItem, this.onRemoveItems});
+      {this.items,
+      this.onAddItem,
+      this.onRemoveItem,
+      this.onRemoveItems,
+      this.onCompleted});
 
   //create a factory constructor to allow us
   //to take in the store and create a _ViewModel class object
@@ -116,12 +121,18 @@ class _ViewModel {
       store.dispatch(RemoveItemsAction());
     }
 
+    _onCompleted(Item item)
+    {
+      store.dispatch(ItemCompletedAction(item));
+    }
     //every time this method is called we will return a new _ViewModel instance from our factory
     return _ViewModel(
         items: store.state.items,
         onAddItem: _onAddItem,
         onRemoveItem: _onRemoveItem,
-        onRemoveItems: _onRemoveItems);
+        onRemoveItems: _onRemoveItems,
+      onCompleted: _onCompleted
+    );
   }
 }
 
@@ -172,6 +183,13 @@ class ItemListWidget extends StatelessWidget {
                 Icons.delete,
                 color: Colors.white,
               )),
+          leading: Checkbox(
+            value: item.completed,
+            //in the on-changed parameter we will give a reducer action
+            onChanged: (b) {
+              model.onCompleted(item);
+            },
+          ),
         );
       }).toList(),
     );

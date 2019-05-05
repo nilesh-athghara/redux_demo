@@ -1,7 +1,5 @@
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:practice/model/model.dart';
-import 'package:practice/redux/reducer.dart';
 import 'package:practice/redux/actions.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -40,6 +38,7 @@ List<Middleware<AppState>> appStateMiddleware([AppState state = const AppState(i
     TypedMiddleware<AppState,RemoveItemsAction>(saveItems),
     TypedMiddleware<AppState,RemoveItemAction>(saveItems),
     TypedMiddleware<AppState,GetItemsAction>(loadItems),
+    TypedMiddleware<AppState,ItemCompletedAction>(saveItems),
   ];
 }
 

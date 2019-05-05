@@ -11,7 +11,14 @@ AppState appStateReducer(AppState state, action) {
   );
 }
 
-Reducer<List<Item>> itemReducer = combineReducers<List<Item>>([]);
+Reducer<List<Item>> itemReducer = combineReducers<List<Item>>([
+  TypedReducer<List<Item>, AddItemAction>(addItemReducer),
+  TypedReducer<List<Item>, RemoveItemAction>(removeItemReducer),
+  TypedReducer<List<Item>, RemoveItemsAction>(removeItemsReducer),
+  TypedReducer<List<Item>, LoadedItemsAction>(loadItemsReducer),
+  TypedReducer<List<Item>, ItemCompletedAction>(itemCompletedReducer),
+
+]);
 
 List<Item> addItemReducer(List<Item> items, AddItemAction action) {
   return []
@@ -19,14 +26,28 @@ List<Item> addItemReducer(List<Item> items, AddItemAction action) {
     ..add(Item(id: action.id, body: action.item));
 }
 
-List<Item> removeItemReducer(List<Item> items, AddItemAction action) {
-  return List.unmodifiable(List.from(elements))
+List<Item> removeItemReducer(List<Item> items, RemoveItemAction action) {
+  return List.unmodifiable(List.from((items)..remove(action.item)));
 }
 
-List<Item> removeItemsReducer(List<Item> items, AddItemAction action) {
+List<Item> removeItemsReducer(List<Item> items, RemoveItemsAction action) {
   return [];
 }
 
+List<Item> loadItemsReducer(List<Item> items, LoadedItemsAction action) {
+  return action.items;
+}
+
+List<Item> itemCompletedReducer(List<Item> items, ItemCompletedAction action) {
+  //here iterate through the current items list
+  //and check if item.id is our current selected item
+  //after that we invert it's boolean value
+  return items
+      .map((item) => (item.id == action.item.id)
+          ? item.copyWith(completed: !item.completed)
+          : item)
+      .toList();
+}
 ////we can create specific reducer to allow us to manipulate only specific data like our list of items
 //
 ////then we can chain these reducers with our parent reducer
